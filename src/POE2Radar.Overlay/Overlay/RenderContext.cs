@@ -240,4 +240,8 @@ public sealed record RenderContext(
     //    same rule collapse to ONE label (drawn "Name xN"); their dots are all still drawn. Screen space
     //    on purpose: whether two labels overlap depends on zoom + window height, so a world-grid
     //    threshold would work at one zoom and fail at another. <= 0 disables. ──
-    float LabelDeclusterPx = 0f);
+      float LabelDeclusterPx = 0f,
+    string? ZoneNotesTitle = null,
+    string? ZoneNotes = null,
+    float ZoneNotesX = 10f,
+    float ZoneNotesY = 140f);
