@@ -203,6 +203,7 @@ public sealed class OverlayRenderer : IDisposable
                 DrawRitualRewards(rt, ctx);            // value chips on the ritual tribute-shop tiles (screen-space)
                 DrawLootTags(rt, ctx);                 // value chips on the game's own loot tags (screen-space)
                 DrawHoverPrice(rt, ctx);               // price chip beside the hovered item's tooltip (screen-space)
+                DrawZoneNotes(rt, ctx);
                 DrawMonolithPanel(rt, ctx);            // nearby-monolith reward list (screen-space)
                 DrawCurrencyExchange(rt, ctx);         // currency-exchange order-book depth panel (top-right, screen-space)
             }
@@ -548,6 +549,31 @@ public sealed class OverlayRenderer : IDisposable
 
     // Atlas biome index (0..12) → border colour (improvement 2). Order matches the dashboard BIOMES list:
     // Grass, Sand, Swamp, Forest, Snow, Stone, Volcanic, Coast, Cave, Vaal, Water, Desert, Special.
+        private void DrawZoneNotes(ID2D1RenderTarget rt, RenderContext ctx)
+    {
+        if (string.IsNullOrWhiteSpace(ctx.ZoneNotes)) return;
+        const float w = 440f, pad = 6f, lineH = 15f, titleH = 18f;
+        const int maxLines = 24;
+
+        var lines = ctx.ZoneNotes!.Replace("\r", "").Split('\n');
+        int n = Math.Min(lines.Length, maxLines);
+        float x = ctx.ZoneNotesX, y = ctx.ZoneNotesY;
+        float h = pad * 2f + titleH + lineH * n;
+        if (x + w > ctx.WindowWidth) x = Math.Max(4f, ctx.WindowWidth - w - 4f);
+        if (y + h > ctx.WindowHeight) y = Math.Max(4f, ctx.WindowHeight - h - 4f);
+
+        rt.FillRectangle(new Vortice.RawRectF(x, y, x + w, y + h), _bPanel!);
+        float cy = y + pad;
+        _bStyle!.Color = ColExchangeGold;
+        var title = string.IsNullOrWhiteSpace(ctx.ZoneNotesTitle) ? "Zone notes" : ctx.ZoneNotesTitle!;
+        rt.DrawText(title, _tf!, Rect.FromLTRB(x + pad, cy, x + w - pad, cy + titleH), _bStyle, DrawTextOptions.Clip);
+        cy += titleH;
+        for (int i = 0; i < n; i++)
+        {
+            rt.DrawText(lines[i], _tf!, Rect.FromLTRB(x + pad, cy, x + w - pad, cy + lineH), _bText!, DrawTextOptions.Clip);
+            cy += lineH;
+        }
+    }
     private static readonly Color4[] BiomeColors =
     {
         new(0.45f, 0.78f, 0.36f, 1f), // 0 Grass
