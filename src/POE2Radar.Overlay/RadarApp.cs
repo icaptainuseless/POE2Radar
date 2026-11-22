@@ -1290,6 +1290,7 @@ public sealed class RadarApp : IDisposable
         // "Always show" draws the overlay even when PoE2 isn't focused (for dashboard calibration).
         var drawActive = realActive || _settings.AlwaysShowOverlay;
         var atlasProj = AtlasProjection(); // resolution-correct (auto from window height) or manual calib
+        var zoneNotes = _settings.ShowZoneNotes ? ZoneGuide.Shared.Notes(snap.AreaCode) : null;
         var ctx = new RenderContext(
             InGame: inGame,
             Active: drawActive,
@@ -1382,7 +1383,11 @@ public sealed class RadarApp : IDisposable
             ExchangeFillNote: ex.Open ? ex.FillNote : null,
             ExchangePanelX: ex.Open ? ex.PanelX : 0f,
             ExchangePanelY: ex.Open ? ex.PanelY : 0f,
-            ExchangeCollapsed: ex.Open && ex.Collapsed);
+            ExchangeCollapsed: ex.Open && ex.Collapsed,
+            ZoneNotesTitle: zoneNotes?.Title,
+            ZoneNotes: zoneNotes?.Notes,
+            ZoneNotesX: _settings.ZoneNotesX,
+            ZoneNotesY: _settings.ZoneNotesY);
         // The overlay is only visible while PoE2 is foreground (Render draws nothing otherwise). Skip
         // the whole draw + UpdateLayeredWindow blit when unfocused — but render once on the focus-loss
         // transition so the last visible frame is cleared rather than left frozen on screen.
